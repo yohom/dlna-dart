@@ -1,22 +1,23 @@
-import 'package:xml/xml.dart';
 import 'dart:math';
 
-class deviceInfo {
+import 'package:xml/xml.dart';
+
+class DeviceInfo {
   final String URLBase;
   final String deviceType;
   final String friendlyName;
   final List<dynamic> serviceList;
-  deviceInfo(
+  DeviceInfo(
       this.URLBase, this.deviceType, this.friendlyName, this.serviceList);
 }
 
-class positionParser {
+class PositionParser {
   String TrackDuration = "00:00:00";
   String TrackURI = "";
   String RelTime = "00:00:00";
   String AbsTime = "00:00:00";
 
-  positionParser(String text) {
+  PositionParser(String text) {
     var doc = XmlDocument.parse(text);
     TrackDuration = doc.findAllElements('TrackDuration').first.text;
     TrackURI = doc.findAllElements('TrackURI').first.text;
@@ -60,11 +61,11 @@ class positionParser {
   }
 }
 
-class xmlParser {
+class XmlParser {
   final String text;
   final XmlDocument doc;
-  xmlParser(this.text) : doc = XmlDocument.parse(text);
-  deviceInfo parse(Uri uri) {
+  XmlParser(this.text) : doc = XmlDocument.parse(text);
+  DeviceInfo parse(Uri uri) {
     String URLBase = "";
     try {
       URLBase = doc.findAllElements('URLBase').first.text;
@@ -86,6 +87,6 @@ class xmlParser {
         "controlURL": controlURL,
       });
     }
-    return deviceInfo(URLBase, deviceType, friendlyName, serviceListItems);
+    return DeviceInfo(URLBase, deviceType, friendlyName, serviceListItems);
   }
 }

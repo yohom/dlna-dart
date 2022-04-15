@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:convert';
 import 'dart:typed_data';
-import 'xmlParser.dart';
+
+import 'xml_parser.dart';
 
 String removeTrailing(String pattern, String from) {
   int i = from.length;
@@ -26,10 +27,10 @@ String htmlEncode(String text) {
   return text;
 }
 
-class device {
-  final deviceInfo info;
+class Device {
+  final DeviceInfo info;
 
-  device(this.info);
+  Device(this.info);
 
   String get controlURL {
     final base = removeTrailing("/", info.URLBase);
@@ -48,7 +49,7 @@ class device {
       'SOAPAction': '"urn:schemas-upnp-org:service:AVTransport:1#$action"',
       'Content-Type': 'text/xml',
     });
-    return http.post(Uri.parse(controlURL), headers, data);
+    return Http.post(Uri.parse(controlURL), headers, data);
   }
 
   Future<String> setUrl(String url) {
@@ -82,7 +83,7 @@ class device {
   }
 
   Future<String> seekByCurrent(String text, int n) {
-    final p = positionParser(text);
+    final p = PositionParser(text);
     final sk = p.seek(n);
     return seek(sk);
   }
@@ -175,7 +176,7 @@ class XmlText {
   }
 }
 
-class http {
+class Http {
   static final client = HttpClient();
 
   static Future<String> get(Uri uri) async {
@@ -208,9 +209,9 @@ class http {
   }
 }
 
-class parser {
+class Parser {
   final String message;
-  parser(this.message);
+  Parser(this.message);
   parse() async {
     final lines = message.split('\n');
     final arr = lines.first.split(' ');
@@ -246,35 +247,35 @@ class parser {
     }
   }
 
-  Future<deviceInfo> getInfo(String uri) async {
+  Future<DeviceInfo> getInfo(String uri) async {
     final target = Uri.parse(uri);
-    final body = await http.get(target);
-    final info = xmlParser(body).parse(target);
+    final body = await Http.get(target);
+    final info = XmlParser(body).parse(target);
     return info;
   }
 }
 
-class manager {
-  final Map<String, device> deviceList = Map();
-  manager();
+class Manager {
+  final Map<String, Device> deviceList = Map();
+  Manager();
   onMessage(String message) async {
-    final deviceInfo? info = await parser(message).parse();
+    final DeviceInfo? info = await Parser(message).parse();
     if (info != null) {
-      deviceList[info.URLBase] = device(info);
+      deviceList[info.URLBase] = Device(info);
     }
   }
 }
 
-class search {
+class Search {
   static const String UPNP_IP_V4 = '239.255.255.250';
   static const int UPNP_PORT = 1900;
   final InternetAddress UPNP_AddressIPv4 = InternetAddress(UPNP_IP_V4);
   Timer sender = Timer(Duration(seconds: 2), () {});
   Timer receiver = Timer(Duration(seconds: 2), () {});
   RawDatagramSocket? socket_server;
-  Future<manager> start({reusePort = false}) async {
+  Future<Manager> start({reusePort = false}) async {
     stop();
-    final m = manager();
+    final m = Manager();
     socket_server = await RawDatagramSocket.bind(
         InternetAddress.anyIPv4, UPNP_PORT,
         reusePort: reusePort);
