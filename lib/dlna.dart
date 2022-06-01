@@ -211,7 +211,9 @@ class Http {
 
 class Parser {
   final String message;
+
   Parser(this.message);
+
   parse() async {
     final lines = message.split('\n');
     final arr = lines.first.split(' ');
@@ -257,7 +259,9 @@ class Parser {
 
 class Manager {
   final Map<String, Device> deviceList = Map();
+
   Manager();
+
   onMessage(String message) async {
     final DeviceInfo? info = await Parser(message).parse();
     if (info != null) {
@@ -273,6 +277,7 @@ class Search {
   Timer sender = Timer(Duration(seconds: 2), () {});
   Timer receiver = Timer(Duration(seconds: 2), () {});
   RawDatagramSocket? socket_server;
+
   Future<Manager> start({reusePort = false}) async {
     stop();
     final m = Manager();

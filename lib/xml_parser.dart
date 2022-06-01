@@ -7,6 +7,7 @@ class DeviceInfo {
   final String deviceType;
   final String friendlyName;
   final List<dynamic> serviceList;
+
   DeviceInfo(
       this.URLBase, this.deviceType, this.friendlyName, this.serviceList);
 }
@@ -64,7 +65,9 @@ class PositionParser {
 class XmlParser {
   final String text;
   final XmlDocument doc;
+
   XmlParser(this.text) : doc = XmlDocument.parse(text);
+
   DeviceInfo parse(Uri uri) {
     String URLBase = "";
     try {
